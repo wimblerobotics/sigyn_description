@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="Sigyn">
-    <xacro:include filename="$(find description)/urdf/gripper_assembly_properties.urdf.xacro" />
+    <xacro:include filename="$(find sigyn_description)/urdf/gripper_assembly_properties.urdf.xacro" />
 
     <xacro:colorize_link color="0.95 1.0 0.95 1.0" name="evelator_pole">
         <foo>
