@@ -15,14 +15,18 @@ from launch import LaunchContext
 from launch.actions import OpaqueFunction
 
 
-def launch_robot_state_publisher(context, file_name_var, use_sim_time):
-    description_directory_path = get_package_share_directory('description')
+def launch_robot_state_publisher(context, file_name_var, use_sim_time, on_a_mac):
+    description_directory_path = get_package_share_directory('sigyn_description')
     file_name = context.perform_substitution(file_name_var)
     print(F"file_name: {file_name}")
     xacro_file_path = os.path.join(
         description_directory_path, 'urdf', file_name)
     print(F"xacro_file_path: {xacro_file_path}")
-    urdf_as_xml = xacro.process_file(xacro_file_path).toxml()
+    
+    # Process xacro with on_a_mac parameter
+    on_a_mac_value = context.perform_substitution(on_a_mac)
+    mappings = {'on_a_mac': on_a_mac_value}
+    urdf_as_xml = xacro.process_file(xacro_file_path, mappings=mappings).toxml()
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -45,10 +49,11 @@ def generate_launch_description():
     publish_joints = LaunchConfiguration('publish_joints')
     urdf_file_name = LaunchConfiguration('urdf_file_name')
     use_sim_time = LaunchConfiguration('use_sim_time')
+    on_a_mac = LaunchConfiguration('on_a_mac')
 
     ld = LaunchDescription()
 
-    description_directory_path = get_package_share_directory('description')
+    description_directory_path = get_package_share_directory('sigyn_description')
     rviz_directory_path = get_package_share_directory('rviz')
 
     ld.add_action(DeclareLaunchArgument(
@@ -74,6 +79,11 @@ def generate_launch_description():
         default_value='false',
         description='Use simulation (Gazebo) clock if true'))
 
+    ld.add_action(DeclareLaunchArgument(
+        name='on_a_mac',
+        default_value='false',
+        description='Set to true if running on Mac Silicon (uses ray sensor instead of gpu_lidar)'))
+
     log_info_action = LogInfo(
         msg=[
             "description.launch.py, do_rviz: ",
@@ -81,7 +91,8 @@ def generate_launch_description():
             ", gui:", gui,
             ", publish_joints: ", publish_joints,
             ", urdf_file_name: ", urdf_file_name,
-            ", use_sim_time: ", use_sim_time
+            ", use_sim_time: ", use_sim_time,
+            ", on_a_mac: ", on_a_mac
         ]
     )
     ld.add_action(log_info_action)
@@ -114,7 +125,7 @@ def generate_launch_description():
     #     name='joint_state_publisher_gui'))
 
     ld.add_action(OpaqueFunction(function=launch_robot_state_publisher, args=[
-        LaunchConfiguration('urdf_file_name'), LaunchConfiguration('use_sim_time')]))
+        LaunchConfiguration('urdf_file_name'), LaunchConfiguration('use_sim_time'), LaunchConfiguration('on_a_mac')]))
     
     echo_action = ExecuteProcess(
         cmd=['echo', 'Rviz config file path: ' +

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ld06">
 
-  <xacro:macro name="ld06" params="lidar_prefix topic_name:=scan *joint_pose">
+  <xacro:macro name="ld06" params="lidar_prefix topic_name:=scan on_a_mac:=false *joint_pose">
     <material name="ld06_${lidar_prefix}_grey">
       <color rgba="0.3 0.3 0.3 1" />
     </material>
@@ -79,34 +79,11 @@
     <gazebo reference="lidar_frame_${lidar_prefix}">
       <material>Gazebo/Black</material>
 
-      <sensor name="lidar_frame_${lidar_prefix}" type="gpu_lidar">
-        <visualize>true</visualize>
-        <update_rate>10</update_rate>
-        <lidar>
-          <scan>
-            <horizontal>
-              <samples>450</samples>
-              <resolution>1</resolution>
-              <min_angle>-3.14159</min_angle>
-              <max_angle>3.14159</max_angle>
-            </horizontal>
-            <vertical>
-              <samples>1</samples>
-              <resolution>1</resolution>
-              <min_angle>0</min_angle>
-              <max_angle>0</max_angle>
-            </vertical>
-          </scan>
-          <range>
-            <min>0.3</min>
-            <max>12.0</max>
-          </range>
-          <noise>
-            <type>gaussian</type>
-            <mean>0.0</mean>
-            <stddev>0.01</stddev>
-          </noise>
-          <!-- Add ray filtering to handle self-collisions -->
+      <!-- Use ray sensor type on Mac Silicon (software GL), gpu_lidar elsewhere -->
+      <xacro:if value="${on_a_mac}">
+        <sensor name="lidar_frame_${lidar_prefix}" type="ray">
+          <visualize>true</visualize>
+          <update_rate>10</update_rate>
           <ray>
             <scan>
               <horizontal>
@@ -120,21 +97,85 @@
               <min>0.3</min>
               <max>12.0</max>
             </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
           </ray>
-        </lidar>
-        <topic>${topic_name}</topic>
-        <gz_frame_id>lidar_beam_${lidar_prefix}</gz_frame_id>
-      </sensor>
+          <topic>${topic_name}</topic>
+          <gz_frame_id>lidar_beam_${lidar_prefix}</gz_frame_id>
+        </sensor>
 
-      <!-- Use correct Gazebo Garden/Harmonic plugin -->
-      <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_gpu_laser.so">
-        <ros>
-          <namespace></namespace>
-          <remapping>~/out:=${topic_name}</remapping>
-        </ros>
-        <output_type>sensor_msgs/LaserScan</output_type>
-        <frame_name>lidar_beam_${lidar_prefix}</frame_name>
-      </plugin>
+        <!-- Use ray-based plugin for Mac Silicon compatibility -->
+        <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_ray_sensor.so">
+          <ros>
+            <namespace></namespace>
+            <remapping>~/out:=${topic_name}</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>lidar_beam_${lidar_prefix}</frame_name>
+        </plugin>
+      </xacro:if>
+
+      <xacro:unless value="${on_a_mac}">
+        <sensor name="lidar_frame_${lidar_prefix}" type="gpu_lidar">
+          <visualize>true</visualize>
+          <update_rate>10</update_rate>
+          <lidar>
+            <scan>
+              <horizontal>
+                <samples>450</samples>
+                <resolution>1</resolution>
+                <min_angle>-3.14159</min_angle>
+                <max_angle>3.14159</max_angle>
+              </horizontal>
+              <vertical>
+                <samples>1</samples>
+                <resolution>1</resolution>
+                <min_angle>0</min_angle>
+                <max_angle>0</max_angle>
+              </vertical>
+            </scan>
+            <range>
+              <min>0.3</min>
+              <max>12.0</max>
+            </range>
+            <noise>
+              <type>gaussian</type>
+              <mean>0.0</mean>
+              <stddev>0.01</stddev>
+            </noise>
+            <!-- Add ray filtering to handle self-collisions -->
+            <ray>
+              <scan>
+                <horizontal>
+                  <samples>450</samples>
+                  <resolution>1</resolution>
+                  <min_angle>-3.14159</min_angle>
+                  <max_angle>3.14159</max_angle>
+                </horizontal>
+              </scan>
+              <range>
+                <min>0.3</min>
+                <max>12.0</max>
+              </range>
+            </ray>
+          </lidar>
+          <topic>${topic_name}</topic>
+          <gz_frame_id>lidar_beam_${lidar_prefix}</gz_frame_id>
+        </sensor>
+
+        <!-- Use GPU-accelerated plugin for better performance -->
+        <plugin name="gazebo_ros_laser_controller" filename="libgazebo_ros_gpu_laser.so">
+          <ros>
+            <namespace></namespace>
+            <remapping>~/out:=${topic_name}</remapping>
+          </ros>
+          <output_type>sensor_msgs/LaserScan</output_type>
+          <frame_name>lidar_beam_${lidar_prefix}</frame_name>
+        </plugin>
+      </xacro:unless>
     </gazebo>
   </xacro:macro>
 
