@@ -63,7 +63,7 @@
   <joint name="base_link_to_elevator_pole" type="fixed">
     <origin xyz="-0.16 -0.015 ${0.3 + (elevator_pole_height/2)}" rpy="0 0 0" />
     <parent link="base_link" />
-    <child link="evelator_pole" />
+    <child link="elevator_pole" />
   </joint>
 
   <!-- <xacro:oakd_link mount_point="elevator_top" /> -->
