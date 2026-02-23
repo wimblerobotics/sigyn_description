@@ -3,7 +3,7 @@
 <package format="3">
   <name>sigyn_description</name>
   <version>1.0.0</version>
-  <description>Sigyn robot URDF package</description>
+  <sigyn_description>Sigyn robot URDF package</sigyn_description>
   <maintainer email="mike@wimblerobotics.com">Michael Wimble</maintainer>
   <license>Apache-2.0</license>
 

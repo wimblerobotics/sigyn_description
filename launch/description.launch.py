@@ -144,6 +144,6 @@ def generate_launch_description():
     ld.add_action(rviz_node)
     
     ld.add_action(LogInfo(
-      msg=["[description] URDF file name: ", LaunchConfiguration('urdf_file_name'), " use_sim_time: ", LaunchConfiguration('use_sim_time')]))
+      msg=["[sigyn_description] URDF file name: ", LaunchConfiguration('urdf_file_name'), " use_sim_time: ", LaunchConfiguration('use_sim_time')]))
 
     return ld
