@@ -44,7 +44,7 @@
        code continues to use the 'top_lidar' name and 'scan' topic. -->
   <xacro:if value="$(arg do_top_lidar)">
     <xacro:ld06 lidar_prefix="top_lidar" topic_name="scan" on_a_mac="$(arg on_a_mac)">
-      <origin xyz="${0.155-0.34} 0 ${1.485}" rpy="0 0 0" />
+      <origin xyz="-0.1625 -0.03 1.73" rpy="0 0 0" />
     </xacro:ld06>
 
     <xacro:ld06 lidar_prefix="cup_lidar" topic_name="scan_cup" on_a_mac="$(arg on_a_mac)">
@@ -54,7 +54,7 @@
 
   <xacro:unless value="$(arg do_top_lidar)">
     <xacro:ld06 lidar_prefix="top_lidar" topic_name="scan" on_a_mac="$(arg on_a_mac)">
-      <origin xyz="0.155 0 0.300" rpy="0 0 -${pi / 2}" />
+      <origin xyz="0.15 0 0.300" rpy="0 0 -${pi / 2}" />
     </xacro:ld06>
   </xacro:unless>
 
@@ -70,83 +70,85 @@
   <!-- <xacro:oakd_link mount_point="elevator_top" /> -->
   <xacro:unless value="$(arg sim_mode)">
     <xacro:oakd_joint mount_point="elevator_top">
-      <origin xyz="-0.0625 0.0 1.665" rpy="${-(90*pi/180.0)} ${-67.0*pi/180.0} 0" />
+      <!-- <origin xyz="-0.0625 0.0 1.665" rpy="0 ${62.0*pi/180.0} ${pi/2}" /> -->
+      <origin xyz="-0.0625 0.0 1.665" rpy="0 ${62.5*pi/180.0} 0" />
+
     </xacro:oakd_joint>
   </xacro:unless>
 
   <xacro:if value="$(arg sim_mode)">
-  <gazebo>
-    <plugin filename="gz-sim-joint-position-controller-system"
-      name="gz::sim::systems::JointPositionController">
-      <joint_name>elevator_pole_to_elevator_connector_plate</joint_name>
-      <p_gain>500.0</p_gain>
-      <i_gain>0.0</i_gain>
-      <d_gain>50.0</d_gain>
-      <i_max>0.0</i_max>
-      <i_min>0.0</i_min>
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>elevator_pole_to_elevator_connector_plate</joint_name>
+        <p_gain>500.0</p_gain>
+        <i_gain>0.0</i_gain>
+        <d_gain>50.0</d_gain>
+        <i_max>0.0</i_max>
+        <i_min>0.0</i_min>
 
-      <cmd_max>50</cmd_max>
-      <cmd_min>-50</cmd_min>
-      <topic>/elevator_connector_plate/position</topic>
-    </plugin>
+        <cmd_max>50</cmd_max>
+        <cmd_min>-50</cmd_min>
+        <topic>/elevator_connector_plate/position</topic>
+      </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
-      name="gz::sim::systems::JointPositionController">
-      <joint_name>gripper_elevator_plate_to_gripper_extender</joint_name>
-      <p_gain>500.0</p_gain>
-      <i_gain>0.0</i_gain>
-      <d_gain>50.0</d_gain>
-      <i_max>0.0</i_max>
-      <i_min>0.0</i_min>
+      <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>gripper_elevator_plate_to_gripper_extender</joint_name>
+        <p_gain>500.0</p_gain>
+        <i_gain>0.0</i_gain>
+        <d_gain>50.0</d_gain>
+        <i_max>0.0</i_max>
+        <i_min>0.0</i_min>
 
-      <cmd_max>1</cmd_max>
-      <cmd_min>-1</cmd_min>
-      <topic>/gripper_elevator_plate_to_gripper_extender/position</topic>
-    </plugin>
+        <cmd_max>1</cmd_max>
+        <cmd_min>-1</cmd_min>
+        <topic>/gripper_elevator_plate_to_gripper_extender/position</topic>
+      </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
-      name="gz::sim::systems::JointPositionController">
-      <joint_name>gripper_wrist_to_parallel_gripper_base_plate</joint_name>
-      <p_gain>1.0</p_gain>
-      <i_gain>0.0</i_gain>
-      <d_gain>0.0</d_gain>
-      <i_max>0.0</i_max>
-      <i_min>0.0</i_min>
+      <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>gripper_wrist_to_parallel_gripper_base_plate</joint_name>
+        <p_gain>1.0</p_gain>
+        <i_gain>0.0</i_gain>
+        <d_gain>0.0</d_gain>
+        <i_max>0.0</i_max>
+        <i_min>0.0</i_min>
 
-      <cmd_max>1</cmd_max>
-      <cmd_min>-1</cmd_min>
-      <topic>/gripper_wrist_to_parallel_gripper_base_plate/position</topic>
-    </plugin>
+        <cmd_max>1</cmd_max>
+        <cmd_min>-1</cmd_min>
+        <topic>/gripper_wrist_to_parallel_gripper_base_plate/position</topic>
+      </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
-      name="gz::sim::systems::JointPositionController">
-      <joint_name>parallel_gripper_base_plate_to_left_finger</joint_name>
-      <p_gain>10000.0</p_gain>
-      <i_gain>0.0</i_gain>
-      <d_gain>100.0</d_gain>
-      <i_max>0.0</i_max>
-      <i_min>0.0</i_min>
+      <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>parallel_gripper_base_plate_to_left_finger</joint_name>
+        <p_gain>10000.0</p_gain>
+        <i_gain>0.0</i_gain>
+        <d_gain>100.0</d_gain>
+        <i_max>0.0</i_max>
+        <i_min>0.0</i_min>
 
-      <cmd_max>1000</cmd_max>
-      <cmd_min>-1000</cmd_min>
-      <topic>/parallel_gripper_base_plate_to_left_finger/position</topic>
-    </plugin>
+        <cmd_max>1000</cmd_max>
+        <cmd_min>-1000</cmd_min>
+        <topic>/parallel_gripper_base_plate_to_left_finger/position</topic>
+      </plugin>
 
-    <plugin filename="gz-sim-joint-position-controller-system"
-      name="gz::sim::systems::JointPositionController">
-      <joint_name>parallel_gripper_base_plate_to_right_finger</joint_name>
-      <p_gain>10000.0</p_gain>
-      <i_gain>0.0</i_gain>
-      <d_gain>100.0</d_gain>
-      <i_max>0.0</i_max>
-      <i_min>0.0</i_min>
+      <plugin filename="gz-sim-joint-position-controller-system"
+        name="gz::sim::systems::JointPositionController">
+        <joint_name>parallel_gripper_base_plate_to_right_finger</joint_name>
+        <p_gain>10000.0</p_gain>
+        <i_gain>0.0</i_gain>
+        <d_gain>100.0</d_gain>
+        <i_max>0.0</i_max>
+        <i_min>0.0</i_min>
 
-      <cmd_max>1000</cmd_max>
-      <cmd_min>-1000</cmd_min>
-      <topic>/parallel_gripper_base_plate_to_right_finger/position</topic>
-    </plugin>
+        <cmd_max>1000</cmd_max>
+        <cmd_min>-1000</cmd_min>
+        <topic>/parallel_gripper_base_plate_to_right_finger/position</topic>
+      </plugin>
 
-  </gazebo>
+    </gazebo>
   </xacro:if>
 
   <xacro:diff_drive_controller config="${props}" instances1="${props.wheels.instances}"
@@ -170,11 +172,11 @@
 
   <link name="imu_1" />
   <xacro:include filename="$(find sigyn_description)/urdf/vl53l0x.xacro" />
-  
+
   <!-- Simulation cameras for Can Do Challenge -->
   <xacro:if value="$(arg sim_mode)">
     <xacro:include filename="$(find sigyn_description)/urdf/sim_cameras.urdf.xacro" />
-    <xacro:oakd_sim_camera parent_link="base_link"/>
-    <xacro:pi_camera_sim parent_link="parallel_gripper_base_plate"/>
+    <xacro:oakd_sim_camera parent_link="base_link" />
+    <xacro:pi_camera_sim parent_link="parallel_gripper_base_plate" />
   </xacro:if>
 </robot>
